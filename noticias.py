@@ -13,14 +13,13 @@ noticias_url = {
     "2": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/news",
     "3": "https://site.api.espn.com/apis/site/v2/sports/racing/f1/news",
     "4": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/news",
-}
+    }
 
-# Nombre bonito de cada deporte para el encabezado de resultados.
-nombres = {"1": "SOCCER", "2": "NBA", "3": "FORMULA 1", "4": "NFL",}
+nombres = {"1": "SOCCER", "2": "NBA", "3": "FORMULA 1", "4": "NFL",} # Nombre bonito de cada deporte para el encabezado de resultados.
 
-# while True mantiene el programa vivo hasta que el usuario decida salir.
-while True:
-    # ----- 1. Mostrar el menu -----
+activo = True
+while activo: # while True mantiene el programa vivo hasta que el usuario decida salir.
+    # MENU
     print("\n" + "=" * 42)
     print("      CONSOLA DE NOTICIAS DEPORTIVAS")
     print("=" * 42)
@@ -33,35 +32,31 @@ while True:
 
     opcion = input("Elige una opcion (1-5): ")
 
-    # ----- 2. Salir del programa -----
+    # 2. Salir del programa
     if opcion == "5":
         print("Gracias por usar la consola!")
-        break  # break rompe el while y termina el programa
+        activo = False  #flag rompe el while y termina el programa
 
-    # ----- 3. Validar que la opcion exista en el menu -----
-    if opcion not in noticias_url:
+    # 3. Validar que la opcion exista en el menu
+    elif opcion not in noticias_url:
         print("Opcion invalida, intenta de nuevo.")
-        continue  # continue regresa al inicio del while sin pedir datos
+        activo = True  # continue regresa al inicio del while sin pedir datos
 
-    # ----- 4. Pedir los datos a ESPN -----
-    url = noticias_url[opcion]              # busca la direccion en el diccionario
-    respuesta = requests.get(url)           # el "mesero" trae los datos
-    datos = respuesta.json()                # convierte la respuesta en diccionario
+    #4. Pedir los datos a ESPN
+    else:
+        url = noticias_url[opcion]              # busca la direccion en el diccionario
+        respuesta = requests.get(url)           # el "mesero" trae los datos
+        datos = respuesta.json()                # convierte la respuesta en diccionario
 
-    # La lista de articulos vive dentro de datos["articles"]
-    articulos = datos["articles"]
+        # La lista de articulos vive dentro de datos["articles"]
+        articulos = datos["articles"]
 
-    # ----- 5. Mostrar los resultados formateados -----
-    print("\n" + "=" * 42)
-    print("   NOTICIAS DE " + nombres[opcion])
-    print("=" * 42)
+        #5. Mostrar los resultados formateados
+        print(f"\n" + "=" * 42)
+        print(f"   NOTICIAS DE " + nombres[opcion])
+        print(f"=" * 42)
 
-    # enumerate da el numero (1,2,3...) y el articulo al mismo tiempo.
-    # articulos[:5] = solo los primeros 5.
-    for numero, articulo in enumerate(articulos[:5], start=1):
-        titulo = articulo["headline"]
-        link = articulo["links"]["web"]["href"]
-        print(f"\n{numero}. {titulo}")
-        print(f"   Link: {link}")
+        for i, articulo in enumerate(articulos[:5], start=1):
+            print(f"\n{i}. {articulo['headline']}")
 
-    print("\n" + "=" * 42)
+        print("\n" + "=" * 42)
