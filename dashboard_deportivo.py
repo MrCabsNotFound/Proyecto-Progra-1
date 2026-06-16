@@ -116,13 +116,14 @@ def obtener_noticias(url):
 #  Envía el artículo favorito a un canal de Discord real
 #  a través de un webhook, creando un mensaje visible al instante.
 # ════════════════════════════════════════════════════════════════
-def guardar_favorito(titular, deporte):
+def guardar_favorito(titular, deporte, link):
     """Postea el artículo favorito a Discord via webhook."""
     mensaje = {
         "username": "Dashboard Deportivo 🏆",
         "content" : (f"⭐ **Nuevo favorito guardado**\n"
                      f"🏅 Deporte: {deporte}\n"
-                     f"📰 {titular}")
+                     f"📰 {titular}\n"
+                     f"🔗 {link}")
     }
     r = requests.post(DISCORD_WEBHOOK, json=mensaje)
     return r.status_code == 204   # 204 = Discord confirmó que lo recibió
@@ -196,10 +197,12 @@ def mostrar_noticias(articulos, deporte):
     eleccion = input("  → ").strip()
 
     if eleccion.isdigit() and 1 <= int(eleccion) <= len(top5):
-        titular = top5[int(eleccion) - 1]["headline"]
+        articulo = top5[int(eleccion) - 1]
+        titular  = articulo["headline"]
+        link     = articulo.get("links", {}).get("web", {}).get("href", "")
 
         with console.status("[bold cyan]Enviando a Discord...[/bold cyan]"):
-            exito = guardar_favorito(titular, deporte)
+            exito = guardar_favorito(titular, deporte, link)
 
         if exito:
             console.print(f"\n  [bold green]✅ ¡Guardado en Discord![/bold green]")
