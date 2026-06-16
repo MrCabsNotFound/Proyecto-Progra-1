@@ -32,7 +32,7 @@ NOTICIAS_URL = {
     "2": "https://site.api.espn.com/apis/site/v2/sports/basketball/nba/news",
     "3": "https://site.api.espn.com/apis/site/v2/sports/racing/f1/news",
     "4": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/news",
-    "5": "https://site.api.espn.com/apis/site/v2/sports/tennis/news",
+    "5": "https://site.api.espn.com/apis/site/v2/sports/baseball/mlb/news",
 }
 
 NOMBRES = {
@@ -40,7 +40,7 @@ NOMBRES = {
     "2": "🏀  NBA",
     "3": "🏎️   FORMULA 1",
     "4": "🏈  NFL",
-    "5": "🎾  TENNIS",
+    "5": "⚾  MLB",
 }
 
 CLIMA_EMOJIS = {
@@ -83,13 +83,18 @@ def verificar_conexion():
 def obtener_dashboard():
     """Trae clima, tipo de cambio y quote del día."""
 
-    # 1. Clima — OpenWeatherMap
-    url_clima   = (f"https://api.openweathermap.org/data/2.5/weather"
-                   f"?q={CIUDAD}&appid={OPENWEATHER_KEY}&units=metric&lang=es")
-    datos_clima = requests.get(url_clima).json()
-    temperatura = datos_clima["main"]["temp"]
-    descripcion = datos_clima["weather"][0]["description"].capitalize()
-    humedad     = datos_clima["main"]["humidity"]
+    # 1. Clima — OpenWeatherMap (puede fallar si la key aún no está activa)
+    try:
+        url_clima   = (f"https://api.openweathermap.org/data/2.5/weather"
+                       f"?q={CIUDAD}&appid={OPENWEATHER_KEY}&units=metric&lang=es")
+        datos_clima = requests.get(url_clima).json()
+        temperatura = datos_clima["main"]["temp"]
+        descripcion = datos_clima["weather"][0]["description"].capitalize()
+        humedad     = datos_clima["main"]["humidity"]
+    except KeyError:
+        temperatura = None
+        descripcion = None
+        humedad     = None
 
     # 2. Tipo de cambio — ExchangeRate API
     url_cambio   = f"https://v6.exchangerate-api.com/v6/{EXCHANGERATE_KEY}/latest/USD"
@@ -133,11 +138,14 @@ def guardar_favorito(titular, deporte):
 def mostrar_dashboard(temperatura, descripcion, humedad, gtq, eur, quote, autor):
     """Construye y muestra el panel principal del dashboard."""
 
-    emoji = get_emoji_clima(descripcion)
-
     contenido = Text(justify="left")
-    contenido.append(f"\n  {emoji} Clima en Guatemala City\n", style="bold cyan")
-    contenido.append(f"     {temperatura:.1f}°C  ·  {descripcion}  ·  Humedad {humedad}%\n\n", style="white")
+    if temperatura is None:
+        contenido.append("\n  ⚠️  Clima no disponible — key de OpenWeatherMap aún no activa\n", style="bold yellow")
+        contenido.append("     Intentá de nuevo en 1-2 horas.\n\n", style="dim yellow")
+    else:
+        emoji = get_emoji_clima(descripcion)
+        contenido.append(f"\n  {emoji} Clima en Guatemala City\n", style="bold cyan")
+        contenido.append(f"     {temperatura:.1f}°C  ·  {descripcion}  ·  Humedad {humedad}%\n\n", style="white")
 
     contenido.append("  💵 Tipo de cambio\n", style="bold green")
     contenido.append(f"     1 USD  =  {gtq:.4f} GTQ\n", style="white")
@@ -165,7 +173,7 @@ def mostrar_menu():
     console.print("   [cyan bold]2.[/cyan bold]  🏀  NBA")
     console.print("   [cyan bold]3.[/cyan bold]  🏎️   Formula 1")
     console.print("   [cyan bold]4.[/cyan bold]  🏈  NFL")
-    console.print("   [cyan bold]5.[/cyan bold]  🎾  Tennis")
+    console.print("   [cyan bold]5.[/cyan bold]  ⚾  MLB")
     console.print("   [cyan bold]6.[/cyan bold]  🚪  Salir")
     console.print()
 
