@@ -1,4 +1,3 @@
-# ============================================================
 #  DASHBOARD DE NOTICIAS DEPORTIVAS — Proyecto Final Progra 1
 #  Clima · Tipo de cambio · Quote del día · Noticias ESPN
 #
@@ -10,7 +9,6 @@
 #    1. requests.head  → verifica conexión antes de arrancar
 #    2. requests.get   → trae clima, cambio, quote y noticias
 #    3. requests.post  → guarda favoritos en Discord
-# ============================================================
 
 import requests
 from rich.console import Console
@@ -62,24 +60,20 @@ def get_emoji_clima(descripcion):
     return "🌡️ "
 
 
-# ════════════════════════════════════════════════════════════════
 #  FUNCIÓN 1 ── requests.head
 #  Hace una petición liviana (solo headers, sin descargar datos)
 #  para verificar que hay internet antes de arrancar el programa.
-# ════════════════════════════════════════════════════════════════
 def verificar_conexion():
-    try:
+    try: #Intenta esto
         requests.head("https://www.cloudflare.com", timeout=5)
-        return True
+        return True #Si llegó acá, perfecto
     except requests.exceptions.RequestException:
-        return False
+        return False #Si no algo falló
 
 
-# ════════════════════════════════════════════════════════════════
 #  FUNCIÓN 2 ── requests.get
 #  Trae datos de 3 APIs distintas para el dashboard,
 #  y también se usa para traer las noticias de ESPN.
-# ════════════════════════════════════════════════════════════════
 def obtener_dashboard():
     """Trae clima, tipo de cambio y quote del día."""
 
@@ -111,11 +105,9 @@ def obtener_noticias(url):
     return datos["articles"]
 
 
-# ════════════════════════════════════════════════════════════════
 #  FUNCIÓN 3 ── requests.post
 #  Envía el artículo favorito a un canal de Discord real
 #  a través de un webhook, creando un mensaje visible al instante.
-# ════════════════════════════════════════════════════════════════
 def guardar_favorito(titular, deporte, link):
     """Postea el artículo favorito a Discord via webhook."""
     mensaje = {
@@ -129,7 +121,7 @@ def guardar_favorito(titular, deporte, link):
     return r.status_code == 204   # 204 = Discord confirmó que lo recibió
 
 
-# ── FUNCIONES DE DISPLAY ──────────────────────────────────────
+#FUNCIONES DE DISPLAY
 
 def mostrar_dashboard(temperatura, descripcion, humedad, gtq, eur, quote, autor):
     """Construye y muestra el panel principal del dashboard."""
